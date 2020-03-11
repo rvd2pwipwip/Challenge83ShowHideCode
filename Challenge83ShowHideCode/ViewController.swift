@@ -29,8 +29,25 @@ class ViewController: UIViewController {
             rootStackView.leadingAnchor.constraint(equalTo: margin.leadingAnchor),
             rootStackView.topAnchor.constraint(equalTo: margin.topAnchor),
             rootStackView.trailingAnchor.constraint(equalTo: margin.trailingAnchor),
+            hideView.leadingAnchor.constraint(equalTo: codeStackView.leadingAnchor),
+            hideView.topAnchor.constraint(equalTo: codeStackView.topAnchor),
+            hideView.trailingAnchor.constraint(equalTo: codeStackView.trailingAnchor),
+            hideView.bottomAnchor.constraint(equalTo: codeStackView.bottomAnchor)
         ])
     }
+    
+    @objc func showCode() {
+        UIViewPropertyAnimator.runningPropertyAnimator(withDuration: 0.25, delay: 0, options: [], animations: {
+            self.hideView.alpha = self.codeSwitch.isOn ? 0 : 1
+        }, completion: nil)
+    }
+    
+    private let hideView: UIView = {
+        let hv = UIView()
+        hv.translatesAutoresizingMaskIntoConstraints = false
+        hv.backgroundColor = .yellow
+        return hv
+    }()
 
     private let codeOne = UILabel.customLabel(text: String(ViewMetrics.code.prefix(2)), backgroundColor: .yellow, font: .systemFont(ofSize: ViewMetrics.fontSize))
     private let blockTwo = ViewMetrics.code.index(ViewMetrics.code.startIndex, offsetBy: 2)..<ViewMetrics.code.index(ViewMetrics.code.endIndex, offsetBy: -2)
@@ -42,22 +59,24 @@ class ViewController: UIViewController {
     
     private lazy var codeStackView: UIStackView = {
         let csv = UIStackView(arrangedSubviews: [codeOne, codeTwo, codeThree])
-        csv.distribution = .equalSpacing
+        csv.distribution = .fillEqually
         csv.spacing = ViewMetrics.spacing
+        csv.insertSubview(hideView, aboveSubview: codeThree)
         return csv
     }()
     
-    private let showSwitch: UISwitch = {
+    private let codeSwitch: UISwitch = {
         let sw = UISwitch()
-        sw.isOn = true
+        sw.isOn = false
+        sw.addTarget(self, action: #selector(showCode), for: .valueChanged)
         return sw
     }()
     
     private lazy var rootStackView: UIStackView = {
-        let csv = UIStackView(arrangedSubviews: [showSwitch, codeStackView])
+        let csv = UIStackView(arrangedSubviews: [codeSwitch, codeStackView])
         csv.translatesAutoresizingMaskIntoConstraints = false
         csv.isLayoutMarginsRelativeArrangement = true
-        csv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+        csv.directionalLayoutMargins = NSDirectionalEdgeInsets(top: ViewMetrics.spacing, leading: ViewMetrics.spacing, bottom: ViewMetrics.spacing, trailing: ViewMetrics.spacing)
         csv.addBackground(color: .purple)
         csv.axis = .vertical
         csv.alignment = .center
